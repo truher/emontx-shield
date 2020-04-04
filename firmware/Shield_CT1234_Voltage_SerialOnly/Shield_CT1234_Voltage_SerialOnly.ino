@@ -7,7 +7,8 @@
   Author: Trystan Lea
 */
 
-#include "EmonLib.h"
+#include "src/EmonLib/EmonLib.h"
+#include "src/ArduinoUniqueID/ArduinoUniqueID.h"
 
 // Create  instances for each CT channel
 EnergyMonitor ct1,ct2,ct3, ct4;
@@ -15,11 +16,25 @@ EnergyMonitor ct1,ct2,ct3, ct4;
 // On-board emonTx LED
 const int LEDpin = 9;                                                    
 
+void printId()
+{
+  for (size_t i = 0; i < UniqueIDsize; i++)
+  {
+    if (UniqueID[i] < 0x10)
+      Serial.print("0");
+    Serial.print(UniqueID[i], HEX);
+  }
+}
+
 void setup() 
 {
   Serial.begin(9600);
-  // while (!Serial) {}
+  while (!Serial) {}
   // wait for serial port to connect. Needed for Leonardo only
+
+  Serial.print("UniqueID: ");
+  printId();
+  Serial.println();
   
   Serial.println("emonTX Shield CT123 Voltage Serial Only example"); 
   Serial.println("OpenEnergyMonitor.org");
@@ -49,7 +64,9 @@ void loop()
   ct3.calcVI(20,2000);
   ct4.calcVI(20,2000);
     
-  // Print power 
+  // Print power
+  printId();
+  Serial.print(" ");
   Serial.print(ct1.realPower);     
   Serial.print(" "); 
   Serial.print(ct2.realPower);
