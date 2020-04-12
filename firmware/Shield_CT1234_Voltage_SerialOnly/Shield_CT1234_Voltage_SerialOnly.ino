@@ -1,43 +1,20 @@
-/*
-  EmonTx CT123 Voltage Serial Only example
-  
-  Part of the openenergymonitor.org project
-  Licence: GNU GPL V3
-  
-  Author: Trystan Lea
-*/
 
+/* GNU GPL V3 Original Author: Trystan Lea */
 #include "src/EmonLib/EmonLib.h"
 #include "src/ArduinoUniqueID/ArduinoUniqueID.h"
 
-// Create  instances for each CT channel
 EnergyMonitor ct1,ct2,ct3, ct4;
 
-// On-board emonTx LED
-const int LEDpin = 9;                                                    
-
-void printId()
-{
-  for (size_t i = 0; i < UniqueIDsize; i++)
-  {
-    if (UniqueID[i] < 0x10)
-      Serial.print("0");
+void printId() {
+  for (size_t i = 0; i < UniqueIDsize; i++) {
+    if (UniqueID[i] < 0x10) Serial.print("0");
     Serial.print(UniqueID[i], HEX);
   }
 }
 
-void setup() 
-{
+void setup() {
   Serial.begin(9600);
   while (!Serial) {}
-  // wait for serial port to connect. Needed for Leonardo only
-
-  Serial.print("UniqueID: ");
-  printId();
-  Serial.println();
-  
-  Serial.println("emonTX Shield CT123 Voltage Serial Only example"); 
-  Serial.println("OpenEnergyMonitor.org");
   
   // Calibration factor = CT ratio / burden resistance = (100A / 0.05A) / 33 Ohms = 60.606
   ct1.current(1, 60.606);
@@ -51,34 +28,45 @@ void setup()
   ct3.voltage(0, 300.6, 1.7);
   ct4.voltage(0, 300.6, 1.7);
   
-  // Setup indicator LED
+  const int LEDpin = 9;
   pinMode(LEDpin, OUTPUT);                                              
-  digitalWrite(LEDpin, HIGH);                                                                                  
+  digitalWrite(LEDpin, HIGH);
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, LOW);
+  Serial.println();
+  Serial.println();
+  Serial.println();
 }
 
-void loop() 
-{ 
-  // Calculate all. No.of crossings, time-out 
-  ct1.calcVI(20,2000);                                                  
-  ct2.calcVI(20,2000);
-  ct3.calcVI(20,2000);
-  ct4.calcVI(20,2000);
-    
-  // Print power
+void loop() {
+  //digitalWrite(LED_BUILTIN, !digitalRead(LED_BUILTIN));
+  digitalWrite(LED_BUILTIN, HIGH);
+  ct1.calcVI(20,1000);
+  digitalWrite(LED_BUILTIN, LOW);
   printId();
-  Serial.print(" ");
-  Serial.print(ct1.realPower);     
-  Serial.print(" "); 
-  Serial.print(ct2.realPower);
-  Serial.print(" "); 
-  Serial.print(ct3.realPower);
-  Serial.print(" "); 
-  Serial.print(ct4.realPower);
-  Serial.print(" "); 
-  Serial.print(ct1.Vrms);
-  Serial.println();
-    
-  // Available properties: ct1.realPower, ct1.apparentPower, ct1.powerFactor, ct1.Irms and ct1.Vrms
+  Serial.print(" ct1 ");
+  Serial.println(ct1.realPower);
 
-  delay(5000);
+  digitalWrite(LED_BUILTIN, HIGH);
+  ct2.calcVI(20,1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  printId();
+  Serial.print(" ct2 ");
+  Serial.println(ct2.realPower);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  ct3.calcVI(20,1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  printId();
+  Serial.print(" ct3 ");
+  Serial.println(ct3.realPower);
+
+  digitalWrite(LED_BUILTIN, HIGH);
+  ct4.calcVI(20,1000);
+  digitalWrite(LED_BUILTIN, LOW);
+  printId();
+  Serial.print(" ct4 ");
+  Serial.println(ct4.realPower);
+
+  delay(1000);
 }
